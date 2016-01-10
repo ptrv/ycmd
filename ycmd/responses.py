@@ -165,6 +165,12 @@ def BuildFixItResponse( fixits ):
     'fixits' : [ BuildFixItData( x ) for x in fixits ]
   }
 
+def BuildCallSignaturesResponse( name, index, params ):
+  return {
+    'name'   : name,
+    'index'  : index,
+    'params' : params
+  }
 
 def BuildExceptionResponse( exception, traceback ):
   return {

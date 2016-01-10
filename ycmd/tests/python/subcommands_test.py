@@ -207,3 +207,24 @@ inception()
       'description': 'c = f()',
       'line_num': 6
     } ] )
+
+
+  def GetCallSignatures_test( self ):
+    filepath = self._PathToTestFile( 'call_signatures.py' )
+    contents = open( filepath ).read()
+
+    event_data = self._BuildRequest( filepath = filepath,
+                                     filetype = 'python',
+                                     line_num = 4,
+                                     column_num = 9,
+                                     contents = contents,
+                                     command_arguments = [ 'GetCallSignatures' ],
+                                     completer_target = 'filetype_default' )
+
+    response = self._app.post_json( '/run_completer_command', event_data ).json
+
+    eq_( response, {
+      'name'   : 'test',
+      'index'  : 1,
+      "params" : [ 'a', 'b', 'c' ]
+    } )

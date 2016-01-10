@@ -231,20 +231,22 @@ class JediCompleter( Completer ):
 
   def GetSubcommandsMap( self ):
     return {
-      'GoToDefinition' : ( lambda self, request_data, args:
-                           self._GoToDefinition( request_data ) ),
-      'GoToDeclaration': ( lambda self, request_data, args:
-                           self._GoToDeclaration( request_data ) ),
-      'GoTo'           : ( lambda self, request_data, args:
-                           self._GoTo( request_data ) ),
-      'GetDoc'         : ( lambda self, request_data, args:
-                           self._GetDoc( request_data ) ),
-      'GoToReferences' : ( lambda self, request_data, args:
-                           self._GoToReferences( request_data ) ),
-      'StopServer'     : ( lambda self, request_data, args:
-                           self.Shutdown() ),
-      'RestartServer'  : ( lambda self, request_data, args:
-                           self.RestartServer() )
+      'GoToDefinition'    : ( lambda self, request_data, args:
+                              self._GoToDefinition( request_data ) ),
+      'GoToDeclaration'   : ( lambda self, request_data, args:
+                              self._GoToDeclaration( request_data ) ),
+      'GoTo'              : ( lambda self, request_data, args:
+                              self._GoTo( request_data ) ),
+      'GetDoc'            : ( lambda self, request_data, args:
+                              self._GetDoc( request_data ) ),
+      'GoToReferences'    : ( lambda self, request_data, args:
+                              self._GoToReferences( request_data ) ),
+      'GetCallSignatures' : ( lambda self, request_data, args:
+                              self._GetCallSignatures( request_data ) ),
+      'StopServer'        : ( lambda self, request_data, args:
+                              self.Shutdown() ),
+      'RestartServer'     : ( lambda self, request_data, args:
+                              self.RestartServer() )
     }
 
 
@@ -328,6 +330,21 @@ class JediCompleter( Completer ):
   def _BuildDetailedInfoResponse( self, definition_list ):
     docs = [ definition[ 'docstring' ] for definition in definition_list ]
     return responses.BuildDetailedInfoResponse( '\n---\n'.join( docs ) )
+
+
+  def _GetCallSignatures( self, request_data ):
+    try:
+      call_signatures = self._GetResponse( '/callsignatures', request_data )
+      signatures = call_signatures[ 'call_signatures' ]
+      if len(signatures) == 1:
+        signature = signatures[0]
+        return responses.BuildCallSignaturesResponse( signature[ 'name' ],
+                                                      signature[ 'index' ],
+                                                      signature[ 'params' ] )
+      else:
+        raise RuntimeError( 'Can\'t get call signatures.' )
+    except:
+      raise RuntimeError( 'Can\'t get call signatures.' )
 
 
   def DebugInfo( self, request_data ):
